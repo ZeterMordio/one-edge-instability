@@ -1,5 +1,8 @@
 # One Edge, Unbounded Instability
 
+[![Software archive DOI](https://zenodo.org/badge/1320866980.svg)](https://doi.org/10.5281/zenodo.21764640)
+[![Paper DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21764586.svg)](https://doi.org/10.5281/zenodo.21764586)
+
 This repository accompanies the preprint:
 
 > Anton Künzi, *One Edge, Unbounded Instability: Hilbert Decomposition Signed
@@ -109,4 +112,8 @@ Lean and Python source code are licensed under Apache-2.0; see
 [paper/LICENSE.md](paper/LICENSE.md). Machine-readable citation metadata is
 in [CITATION.cff](CITATION.cff). The release repository is
 [`ZeterMordio/one-edge-instability`](https://github.com/ZeterMordio/one-edge-instability).
-The Zenodo DOIs will be added at release time.
+The version 1.0 preprint is archived at
+[doi:10.5281/zenodo.21764586](https://doi.org/10.5281/zenodo.21764586).
+The corresponding `v1.0.0` software release is archived at
+[doi:10.5281/zenodo.21764641](https://doi.org/10.5281/zenodo.21764641)
+and records Git commit `9cf9f40bf975a2ba637e24715c2a3f99082df5ce`.

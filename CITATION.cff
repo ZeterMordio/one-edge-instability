@@ -14,6 +14,7 @@ authors:
     affiliation: "Independent researcher, prev. ETH Zurich"
 version: 1.0.0
 date-released: 2026-08-03
+doi: "10.5281/zenodo.21764641"
 license: Apache-2.0
 repository-code: "https://github.com/ZeterMordio/one-edge-instability"
 keywords:
@@ -32,3 +33,4 @@ preferred-citation:
       affiliation: "Independent researcher, prev. ETH Zurich"
   year: 2026
   month: 7
+  doi: "10.5281/zenodo.21764586"
