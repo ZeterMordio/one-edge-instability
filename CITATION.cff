@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite the paper below."
+title: "One Edge, Unbounded Instability: Lean Formalization and Reproducible Artifacts"
+type: software
+abstract: >-
+  Lean 4 formalization and independent finite checks for counterexamples to
+  proposed dimension-only stability bounds for Hilbert decomposition signed
+  measures in multiparameter persistence.
+authors:
+  - family-names: "Künzi"
+    given-names: "Anton"
+    orcid: "https://orcid.org/0009-0002-1301-4631"
+    email: "anton.kuenzi@alumni.ethz.ch"
+    affiliation: "Independent researcher, prev. ETH Zurich"
+version: 1.0.0
+date-released: 2026-08-03
+license: Apache-2.0
+repository-code: "https://github.com/ZeterMordio/one-edge-instability"
+keywords:
+  - "multiparameter persistence"
+  - "persistent homology"
+  - "Hilbert decomposition signed measures"
+  - "formal verification"
+  - "Lean 4"
+preferred-citation:
+  type: article
+  title: "One Edge, Unbounded Instability: Hilbert Decomposition Signed Measures in Multiparameter Persistence"
+  authors:
+    - family-names: "Künzi"
+      given-names: "Anton"
+      orcid: "https://orcid.org/0009-0002-1301-4631"
+      affiliation: "Independent researcher, prev. ETH Zurich"
+  year: 2026
+  month: 7

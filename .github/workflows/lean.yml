@@ -1,0 +1,32 @@
+name: Lean
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Lean environment
+        uses: leanprover/lean-action@v1
+        with:
+          build: true
+
+      - name: Check compiled environment with leanchecker
+        run: lake env leanchecker OneEdgeInstability
+
+      - name: Reject trust escapes
+        run: |
+          if rg -n '\b(sorry|admit|axiom|unsafe)\b' --glob '*.lean'; then
+            echo "Forbidden Lean trust escape found."
+            exit 1
+          fi

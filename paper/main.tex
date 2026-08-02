@@ -1,0 +1,957 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1.05in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{aliascnt}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,positioning}
+\usepackage{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+\definecolor{sourceblue}{HTML}{2563EB}
+\definecolor{targetred}{HTML}{DC2626}
+\definecolor{softgray}{HTML}{64748B}
+\definecolor{darkink}{HTML}{172033}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=sourceblue,
+  citecolor=sourceblue,
+  urlcolor=sourceblue,
+  pdftitle={One Edge, Unbounded Instability: Hilbert Decomposition Signed Measures in Multiparameter Persistence},
+  pdfauthor={Anton Künzi},
+  pdfsubject={Multiparameter persistent homology; Hilbert decomposition signed measures; formal verification},
+  pdfkeywords={multiparameter persistence, Hilbert function, signed measure, Wasserstein distance, Lean}
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newaliascnt{proposition}{theorem}
+\newtheorem{proposition}[proposition]{Proposition}
+\aliascntresetthe{proposition}
+\newaliascnt{lemma}{theorem}
+\newtheorem{lemma}[lemma]{Lemma}
+\aliascntresetthe{lemma}
+\newaliascnt{corollary}{theorem}
+\newtheorem{corollary}[corollary]{Corollary}
+\aliascntresetthe{corollary}
+\theoremstyle{definition}
+\newaliascnt{definition}{theorem}
+\newtheorem{definition}[definition]{Definition}
+\aliascntresetthe{definition}
+\newaliascnt{remark}{theorem}
+\newtheorem{remark}[remark]{Remark}
+\aliascntresetthe{remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\KR}{\mathrm{KR}}
+\newcommand{\Hil}{\mathrm{Hil}}
+\newcommand{\dI}{d_{\mathcal I}^{1}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\join}{\mathbin{\vee}}
+\newcommand{\doi}[1]{\href{https://doi.org/#1}{\nolinkurl{doi:#1}}}
+\newcommand{\fm}{f_m}
+\newcommand{\gm}{g_m}
+\newcommand{\Sm}{S_m}
+
+\newcommand{\papertitlelead}{One Edge, Unbounded Instability:}
+\newcommand{\papertitlesub}{Hilbert Decomposition Signed Measures in Multiparameter Persistence}
+
+\newcommand{\makepapermodernfrontmatter}{%
+  \vspace*{-2.2em}
+  \noindent
+  \begin{minipage}{\textwidth}
+    \sffamily
+    \textcolor{softgray}{\small\bfseries PREPRINT}
+    \hfill\textcolor{softgray}{\small 30 July 2026}\par
+    \vspace{0.7em}
+    \textcolor{sourceblue}{\rule{\textwidth}{1.2pt}}\par
+    \vspace{0.75em}
+    {\fontsize{23}{27}\selectfont\bfseries\color{darkink}\papertitlelead\par}
+    \vspace{0.2em}
+    {\Large\color{darkink}\papertitlesub\par}
+    \vspace{0.85em}
+    {\large\bfseries\color{darkink}Anton Künzi\par}
+    \vspace{0.35em}
+    {\small\color{darkink}Independent researcher, prev.\ ETH Zurich\par}
+    {\small
+     ORCID: \href{https://orcid.org/0009-0002-1301-4631}{0009-0002-1301-4631}
+     \enspace\textcolor{softgray}{/}\enspace
+     \href{mailto:anton.kuenzi@alumni.ethz.ch}{anton.kuenzi@alumni.ethz.ch}\par}
+    \vspace{0.6em}
+    \textcolor{softgray!45}{\rule{\textwidth}{0.5pt}}
+  \end{minipage}
+  \vspace{0.6em}
+}
+
+\newcommand{\makepapertraditionalfrontmatter}{%
+  \vspace*{-1.5em}
+  \begin{center}
+    {\LARGE\bfseries\papertitlelead\par}
+    \vspace{0.25em}
+    {\Large\papertitlesub\par}
+    \vspace{1.05em}
+    \paperauthorblock
+    \vspace{0.55em}
+    {\small\textit{Preprint}
+     \enspace\textperiodcentered\enspace 30 July 2026\par}
+  \end{center}
+  \paperauthornote
+  \vspace{0.8em}
+}
+
+\ifdefined\paperoptiononea
+  \newcommand{\paperauthorblock}{%
+    {\large Anton Künzi\par}
+    \vspace{0.35em}
+    {\small Independent researcher, prev.\ ETH Zurich\par}
+    {\small
+     ORCID: \href{https://orcid.org/0009-0002-1301-4631}{0009-0002-1301-4631}
+     \enspace\textperiodcentered\enspace
+     \href{mailto:anton.kuenzi@alumni.ethz.ch}{anton.kuenzi@alumni.ethz.ch}\par}
+  }
+  \newcommand{\paperauthornote}{}
+  \newcommand{\makepaperfrontmatter}{\makepapertraditionalfrontmatter}
+\else
+  \ifdefined\paperoptiononeb
+    \newcommand{\paperauthorblock}{{\large Anton Künzi\footnotemark\par}}
+    \newcommand{\paperauthornote}{%
+      \footnotetext{Independent researcher, prev.\ ETH Zurich. ORCID:
+      \href{https://orcid.org/0009-0002-1301-4631}{0009-0002-1301-4631}.
+      \href{mailto:anton.kuenzi@alumni.ethz.ch}{anton.kuenzi@alumni.ethz.ch}.}
+    }
+    \newcommand{\makepaperfrontmatter}{\makepapertraditionalfrontmatter}
+  \else
+    \newcommand{\makepaperfrontmatter}{\makepapermodernfrontmatter}
+  \fi
+\fi
+
+\begin{document}
+\makepaperfrontmatter
+
+\begin{abstract}
+We prove that Hilbert decomposition signed measures, a computable summary of
+multiparameter persistent homology, are not uniformly stable over all finite
+filtrations once there are at least three parameters.  For every $n\geq3$ and
+$m\geq1$, we construct two filtrations of the same finite graph that differ
+only in the grade of one edge, yet
+\[
+  \lVert f_m-g_m\rVert_1=1,\qquad
+  \bigl\lVert\mu_{H_0(f_m)}-\mu_{H_0(g_m)}\bigr\rVert_{\KR,1}=2m.
+\]
+The output distance is therefore unbounded at fixed input distance one.  This
+settles an open question of Loiseaux et al.~\cite{LoiseauxEtAl2023} and gives a
+\hyperref[cor:phase]{sharp dimensional cutoff}: the dimension-only estimate
+holds for one and two parameters, but no finite dimension-only constant exists
+for $n\geq3$.
+Rescaling puts every grade in the unit cube with input distance $1/m$ and
+output distance two, ruling out a graph-independent modulus of continuity.
+The four-vertex diamond graph is the smallest violation; after subdivision,
+the same mechanism occurs in lower-star filtrations.  The corresponding
+module-level bound also fails.  The counterexample family and its main
+quantitative consequences are
+\hyperref[app:lean]{formalized and kernel-checked in Lean}.
+\end{abstract}
+
+\section{Introduction}
+
+Multiparameter persistent homology indexes a filtration by vectors in
+$\R^n$.  The resulting modules rarely admit barcodes, so topological data
+analysis uses computable summaries such as Hilbert functions, multigraded
+Betti numbers, rank invariants, and signed decompositions
+\cite{BotnanLesnick2023,BotnanOppermannOudot2025}.  A Hilbert decomposition
+encodes the Hilbert function as a finite signed point measure.  These measures
+support stable vectorizations for machine learning~\cite{LoiseauxEtAl2023}
+and are implemented in \texttt{multipers}~\cite{LoiseauxSchreiber2024}.
+
+Loiseaux et al.\ proved that, for a finite simplicial complex $S$ and
+monotone maps $f,g:S\to\R^n$,
+\begin{equation}\label{eq:known-positive}
+  \bigl\lVert\mu_{H_i(f)}-\mu_{H_i(g)}\bigr\rVert_{\KR,1}
+  \leq n\lVert f-g\rVert_1
+  \qquad(n\in\{1,2\}),
+\end{equation}
+and explicitly left the extension to $n>2$ open
+\cite[Theorem~1(1)]{LoiseauxEtAl2023}.  Oudot and Scoccola proved the
+corresponding one- and two-parameter module-level estimate
+\cite[Theorem~1.5]{OudotScoccola2024}.  We show that both extensions fail in
+every parameter dimension $n\geq3$.  The failure already occurs in degree-zero
+persistent homology of graphs when the grade of a single edge changes.
+
+\begin{theorem}[Filtered-graph counterexample]\label{thm:main}
+Fix a coefficient field.  For every $n\geq3$ and every integer $m\geq1$,
+there are a finite simple graph $\Sm$ and monotone filtrations
+$\fm,\gm:\Sm\to\R^n$ such that
+\[
+  \lVert\fm-\gm\rVert_1=1,\qquad
+  \bigl\lVert\mu_{H_0(\fm)}-\mu_{H_0(\gm)}\bigr\rVert_{\KR,1}=2m.
+\]
+Only one edge has different grades under $\fm$ and $\gm$.
+\end{theorem}
+
+The four-vertex case is displayed in \cref{sec:diamond}.  The general
+construction and the proof of \cref{thm:main}, including the exact transport
+calculation and the extension from three to $n$ parameters, are given in
+\cref{sec:family}.
+
+\begin{corollary}[Exact dimensional phase transition]\label{cor:phase}
+A finite constant depending only on parameter dimension can bound the
+Hilbert signed-measure distance by filtration $\ell^1$-displacement for all
+finite filtered complexes if and only if $n\leq2$.
+\end{corollary}
+
+Equation~\eqref{eq:known-positive} gives the positive half of
+\cref{cor:phase}, and \cref{thm:main} gives the negative half.  In fact, the
+failure is not specific to the proposed constant $n$: no finite constant
+depending only on dimension can work.  After scalar rescaling,
+\cref{cor:no-modulus} rules out even a graph-independent modulus of
+continuity on the unit cube.  The graph in our construction grows with $m$.
+This is compatible with the fixed-complex Lipschitz theorem of Scoccola et
+al., whose constant may depend on the complex
+\cite[Proposition~E.3]{ScoccolaEtAl2024}.
+
+The smallest violation of the proposed three-parameter constant occurs at
+$m=2$.  Its graph is the diamond $K_4\setminus\{\text{one edge}\}$, and its
+exact output cost is $4>3$.  By \cref{prop:minimal}, no simple graph with
+fewer vertices or fewer edges can violate the constant.
+
+The module-level bound fails as well.  Let $M_m=H_0(f_m)$ and
+$N_m=H_0(g_m)$.  Their cellular presentations have the same incidence
+matrix; one column label moves by $\ell^1$-distance one.  The path-metric
+presentation distance of Bjerkevik and Lesnick
+\cite{BjerkevikLesnick2021} then gives the following result.
+
+\begin{theorem}[Presentation-distance counterexample]\label{thm:p3}
+For every $n\geq3$ and $m\geq1$, there are finitely presented
+$n$-parameter persistence modules $M_m,N_m$ such that
+\[
+  \dI(M_m,N_m)\leq1,\qquad
+  d^{\Hil}_{W,1}(M_m,N_m)=2m.
+\]
+No finite dimension-only constant therefore bounds Hilbert signed
+$1$-Wasserstein distance by $\dI$ for fixed $n\geq3$.
+\end{theorem}
+
+We prove \cref{thm:p3} in \cref{sec:p3}.  The unit-cube and lower-star
+variants, the minimality result, and the $H_1$/Euler calculation are proved in
+\cref{sec:diamond,sec:consequences}.  Reproducibility information appears in
+\cref{sec:artifact};
+\hyperref[app:lean]{Appendix~\ref*{app:lean}} records the correspondence
+between the paper statements and their Lean formalization.
+
+\section{Hilbert signed measures and transport}\label{sec:background}
+
+Let $K$ be a finite simplicial complex.  A filtration
+$f:K\to\R^n$ is \emph{monotone} when
+$f(\tau)\leq f(\sigma)$ coordinatewise whenever $\tau$ is a face of
+$\sigma$.  Its sublevel complex at $x\in\R^n$ is
+\[
+  K^f_x=\{\sigma\in K:f(\sigma)\leq x\}.
+\]
+Fixing a coefficient field, the persistent homology module has Hilbert
+function
+\[
+  h_{H_i(f)}(x)=\dim H_i(K^f_x).
+\]
+For two filtrations of the same finite complex, we use the simplexwise
+$\ell^1$ norm
+\[
+  \lVert f-g\rVert_1
+  =\sum_{\sigma\in K}\lVert f(\sigma)-g(\sigma)\rVert_1.
+\]
+
+For the finitely presentable modules considered here, the
+\emph{Hilbert decomposition signed measure} $\mu_M$ is the unique finite
+signed point measure satisfying
+\begin{equation}\label{eq:hilbert-decomp}
+  h_M(x)=\mu_M((-\infty,x])
+  \quad\text{for all }x\in\R^n,
+  \qquad
+  (-\infty,x]=\{y:y\leq x\}.
+\end{equation}
+This is the Möbius inverse of the Hilbert function
+\cite[Definition~4 and Appendix~A.4]{LoiseauxEtAl2023}.  We write
+$\mu_{H_i(f)}$ for the measure of $H_i(f)$.
+
+If a finite signed atomic measure $\Delta$ has Jordan decomposition
+$\Delta=\Delta^+-\Delta^-$ with equal positive and negative total mass,
+Loiseaux et al.\ define its Kantorovich-Rubinstein norm with $\ell^1$ ground
+cost as follows~\cite[Definition~3]{LoiseauxEtAl2023}:
+\begin{equation}\label{eq:kr}
+  \lVert\Delta\rVert_{\KR,1}
+  =\inf_{\pi\in\Pi(\Delta^+,\Delta^-)}
+      \int_{\R^n\times\R^n}\lVert x-y\rVert_1\,d\pi(x,y).
+\end{equation}
+All measures below are finite sums of unit atoms, so \eqref{eq:kr} is a
+finite transportation problem.  The lower bound uses only the fact that
+distinct integer-lattice points have distance at least one.  Explicit
+matchings give the upper bound.
+
+The Euler decomposition signed measure
+\cite[Definition~5]{LoiseauxEtAl2023} is
+\[
+  \mu_{\chi(f)}=\sum_i(-1)^i\mu_{H_i(f)}.
+\]
+Unlike the degree-specific Hilbert measures, it satisfies the
+dimension-independent estimate
+\begin{equation}\label{eq:euler-positive}
+  \lVert\mu_{\chi(f)}-\mu_{\chi(g)}\rVert_{\KR,1}
+  \leq \lVert f-g\rVert_1
+\end{equation}
+in every parameter dimension~\cite[Theorem~1(2)]{LoiseauxEtAl2023}.
+
+\section{The four-vertex counterexample}\label{sec:diamond}
+
+The graph $S_2$ has vertices $s,t,u_1,u_2$, central edge
+$e=\{s,t\}$, and two two-edge paths
+$s-a_j-u_j-b_j-t$.  Every vertex has grade $(0,0,0)$, the arm grades agree
+under $f_2$ and $g_2$, and only $e$ moves:
+\[
+\begin{array}{c|ccccc}
+ & a_1 & b_1 & a_2 & b_2 & e\\
+\midrule
+ f_2 & (0,1,0)&(0,0,2)&(0,2,0)&(0,0,1)&(2,0,0)\\
+ g_2 & (0,1,0)&(0,0,2)&(0,2,0)&(0,0,1)&(1,0,0).
+\end{array}
+\]
+The filtered diamond is shown in \cref{fig:diamond}.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  vertex/.style={circle,draw=darkink,fill=white,minimum size=7mm,inner sep=1pt},
+  common/.style={draw=darkink,line width=0.9pt},
+  moved/.style={draw=targetred,line width=2.2pt},
+  lab/.style={font=\scriptsize,fill=white,inner sep=1.5pt}
+]
+  \node[vertex] (s) at (-2.8,0) {$s$};
+  \node[vertex] (t) at ( 2.8,0) {$t$};
+  \node[vertex] (u1) at (0,1.7) {$u_1$};
+  \node[vertex] (u2) at (0,-1.7) {$u_2$};
+  \draw[common] (s)--node[lab,above left] {$(0,1,0)$} (u1);
+  \draw[common] (u1)--node[lab,above right] {$(0,0,2)$} (t);
+  \draw[common] (s)--node[lab,below left] {$(0,2,0)$} (u2);
+  \draw[common] (u2)--node[lab,below right] {$(0,0,1)$} (t);
+  \draw[moved] (s)--node[lab,above] {$e:\ (2,0,0)\mapsto(1,0,0)$} (t);
+  \node[font=\small,align=center,text=softgray] at (0,-2.55)
+    {$\lVert f_2-g_2\rVert_1=1$ \qquad
+     $\lVert\Delta_2\rVert_{\KR,1}=4$};
+\end{tikzpicture}
+\caption{The diamond graph is the minimal counterexample: one edge moves by
+one, while the degree-zero Hilbert signed measure moves by four.}
+\label{fig:diamond}
+\end{figure}
+
+The signed-measure difference $\Delta_2=\mu_{H_0(f_2)}-\mu_{H_0(g_2)}$
+has positive atoms
+\[
+ (1,0,0),\ (1,2,2),\ (2,1,2),\ (2,2,1)
+\]
+and negative atoms
+\[
+ (1,1,2),\ (1,2,1),\ (2,0,0),\ (2,2,2).
+\]
+The supports are disjoint subsets of $\Z^3$, so every coupling costs at
+least four.  Matching vertically between the layers $r=1$ and $r=2$ costs
+exactly four.  Since only $e$ moves, this proves $4>3\cdot1$.
+
+\begin{proposition}[Minimality of the diamond]\label{prop:minimal}
+Among simple graphs with arbitrary monotone three-parameter filtrations, a
+counterexample to the proposed constant $3$ requires at least four vertices
+and at least five edges.  Hence $S_2$ is simultaneously vertex-minimal and
+edge-minimal.
+\end{proposition}
+
+\begin{proof}
+A simple graph with at most four edges has cycle rank at most one.  If it is
+a forest, then $\mu_{H_1}=0$ and
+$\mu_{H_0}=\mu_\chi$, so \eqref{eq:euler-positive} gives the stronger
+constant $1$.
+
+If the graph is unicyclic, let $C$ be its unique cycle.  Its $H_1$ Hilbert
+function is the indicator of the upper orthant born at
+\[
+  b_f=\bigvee_{e\in C}f(e).
+\]
+Monotonicity makes the vertex grades irrelevant once the cycle edges are
+present.  Hence $\mu_{H_1(f)}=\delta_{b_f}$, and similarly for $g$.  For each
+coordinate, the maximum operation is $1$-Lipschitz, hence
+\[
+  \lVert b_f-b_g\rVert_1
+  \leq\sum_{e\in C}\lVert f(e)-g(e)\rVert_1
+  \leq\lVert f-g\rVert_1.
+\]
+Using $\mu_{H_0}=\mu_\chi+\mu_{H_1}$ and the triangle inequality gives
+\[
+  \lVert\mu_{H_0(f)}-\mu_{H_0(g)}\rVert_{\KR,1}
+  \leq2\lVert f-g\rVert_1.
+\]
+No graph with at most four edges can therefore violate the constant $3$.
+A simple graph with at most three vertices has at most three edges, which
+also proves vertex-minimality.
+\end{proof}
+
+\section{The general family}\label{sec:family}
+
+\subsection{Graph and filtrations}
+
+For $m\geq1$, let $\Sm$ have vertices
+\[
+  s,t,u_1,\ldots,u_m
+\]
+and edges
+\[
+  e=\{s,t\},\qquad a_j=\{s,u_j\},\qquad b_j=\{u_j,t\}
+  \quad(1\leq j\leq m).
+\]
+There are no higher-dimensional simplices.  Give every vertex grade
+$(0,0,0)$ and set
+\begin{align*}
+  \fm(a_j)=\gm(a_j)&=(0,j,0),\\
+  \fm(b_j)=\gm(b_j)&=(0,0,m+1-j),\\
+  \fm(e)&=(2,0,0),&
+  \gm(e)&=(1,0,0).
+\end{align*}
+All coordinates are nonnegative, so the filtrations are monotone.  Only $e$
+moves, and therefore
+\begin{equation}\label{eq:input-one}
+  \lVert\fm-\gm\rVert_1=1.
+\end{equation}
+The construction and the staircase measure arising below are summarized in
+\cref{fig:family}.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  vertex/.style={circle,draw=darkink,fill=white,minimum size=6.5mm,inner sep=1pt},
+  common/.style={draw=darkink,line width=0.8pt},
+  moved/.style={draw=targetred,line width=2pt},
+  atomplus/.style={circle,fill=sourceblue,draw=sourceblue,minimum size=4.5pt,inner sep=0pt},
+  atomminus/.style={rectangle,fill=targetred,draw=targetred,minimum size=4.5pt,inner sep=0pt},
+  lab/.style={font=\scriptsize,fill=white,inner sep=1pt}
+]
+  \begin{scope}[xshift=-4.4cm]
+    \node[vertex] (s) at (-2.0,0) {$s$};
+    \node[vertex] (t) at ( 2.0,0) {$t$};
+    \node[vertex] (u1) at (0,1.65) {$u_1$};
+    \node[vertex] (u2) at (0,0.65) {$u_2$};
+    \node at (0,-0.25) {$\vdots$};
+    \node[vertex] (um) at (0,-1.35) {$u_m$};
+    \draw[common] (s)--(u1)--(t);
+    \draw[common] (s)--(u2)--(t);
+    \draw[common] (s)--(um)--(t);
+    \draw[moved] (s)--node[lab,below] {$e$} (t);
+    \node[font=\small,text=softgray] at (0,-2.05) {$S_m$: $m$ parallel two-edge paths};
+  \end{scope}
+  \begin{scope}[xshift=3.6cm,yshift=-1.55cm,scale=0.72]
+    \draw[-{Latex[length=2mm]},darkink] (-0.3,0)--(6.1,0) node[right] {$y$};
+    \draw[-{Latex[length=2mm]},darkink] (0,-0.3)--(0,6.1) node[above] {$z$};
+    \foreach \j in {1,...,5}{
+      \pgfmathtruncatemacro{\z}{6-\j}
+      \node[atomminus] at (\j,\z) {};
+    }
+    \foreach \j in {1,...,4}{
+      \pgfmathtruncatemacro{\x}{\j+1}
+      \pgfmathtruncatemacro{\z}{6-\j}
+      \node[atomplus] at (\x,\z) {};
+    }
+    \node[atomplus] at (0,0) {};
+    \draw[dashed,softgray] (1,5)--(2,5)--(2,4)--(3,4)--(3,3)--(4,3)--(4,2)--(5,2)--(5,1);
+    \node[font=\scriptsize,text=sourceblue,anchor=west] at (0.25,5.75) {positive: $0,c_j$};
+    \node[font=\scriptsize,text=targetred,anchor=west] at (3.25,5.75) {negative: $p_j$};
+    \node[font=\small,text=softgray] at (3,-1.0) {staircase measure $\nu_m$ (shown for $m=5$)};
+  \end{scope}
+\end{tikzpicture}
+\caption{Left: the graph family.  Right: the two-dimensional staircase
+Möbius measure; the blue circle at the origin and the blue corner atoms
+alternate with the red path atoms.}
+\label{fig:family}
+\end{figure}
+
+\subsection{The component-count formula}
+
+Write a parameter as $x=(r,y,z)$.  Outside the slab $1\leq r<2$, the two
+sublevel graphs agree.  Inside the slab, the $g_m$-sublevel graph contains
+$e$ while the $f_m$-sublevel graph does not.  Adding $e$ merges two
+components exactly when no path $s-u_j-t$ is complete.  The $j$th path is
+complete exactly when
+\[
+  y\geq j,\qquad z\geq m+1-j.
+\]
+Define
+\[
+q_m(y,z)=
+\begin{cases}
+1,&y,z\geq0\ \text{and no }j\text{ satisfies }
+       y\geq j,\ z\geq m+1-j,\\
+0,&\text{otherwise}.
+\end{cases}
+\]
+Since ordinary $H_0$ is the free vector space on connected components, over
+every coefficient field,
+\begin{equation}\label{eq:hilbert-difference}
+  D_m(r,y,z)
+  :=\dim H_0(K^{f_m}_{(r,y,z)})
+     -\dim H_0(K^{g_m}_{(r,y,z)})
+  =\1_{[1,2)}(r)q_m(y,z).
+\end{equation}
+
+\subsection{Möbius inversion of the staircase}
+
+For $1\leq j\leq m$, put
+\[
+  p_j=(j,m+1-j),
+\]
+and, for $1\leq j<m$, put
+\[
+  c_j=p_j\join p_{j+1}=(j+1,m+1-j).
+\]
+Define the signed point measure
+\begin{equation}\label{eq:nu}
+  \nu_m=\delta_{(0,0)}
+        -\sum_{j=1}^{m}\delta_{p_j}
+        +\sum_{j=1}^{m-1}\delta_{c_j}.
+\end{equation}
+
+\begin{lemma}[Staircase inversion]\label{lem:staircase}
+For every $(y,z)\in\R^2$,
+\[
+  \nu_m((-\infty,y]\times(-\infty,z])=q_m(y,z).
+\]
+\end{lemma}
+
+\begin{proof}
+If $y<0$ or $z<0$, both sides vanish.  Otherwise let
+\[
+  A(y,z)=\{j:p_j\leq(y,z)\}.
+\]
+Because the first coordinates of the $p_j$ increase while their second
+coordinates decrease, $A(y,z)$ is empty or a consecutive interval.  If it
+has $a>0$ elements, exactly $a-1$ adjacent joins $c_j$ lie below $(y,z)$.
+The cumulative value of \eqref{eq:nu} is then
+$1-a+(a-1)=0$.  If $A(y,z)$ is empty, its value is $1$.
+\end{proof}
+
+Let $\eta=\delta_1-\delta_2$ on $\R$.  Its cumulative function is
+$\1_{[1,2)}$.  Equations \eqref{eq:hilbert-decomp},
+\eqref{eq:hilbert-difference}, and \cref{lem:staircase} give
+\begin{equation}\label{eq:delta-tensor}
+  \Delta_m
+  :=\mu_{H_0(f_m)}-\mu_{H_0(g_m)}
+  =\eta\otimes\nu_m.
+\end{equation}
+
+Write
+\[
+  \nu_m^+=\delta_{(0,0)}+\sum_{j=1}^{m-1}\delta_{c_j},
+  \qquad
+  \nu_m^-=\sum_{j=1}^{m}\delta_{p_j}.
+\]
+Both have mass $m$, and no atom cancels in
+\begin{align}
+  \Delta_m^+
+    &=\delta_1\otimes\nu_m^+
+      +\delta_2\otimes\nu_m^-,
+      \label{eq:positive}\\
+  \Delta_m^-
+    &=\delta_1\otimes\nu_m^-
+      +\delta_2\otimes\nu_m^+.
+      \label{eq:negative}
+\end{align}
+The origin, the $p_j$, and the $c_j$ are distinct in every potentially
+cancelling pair.  Hence \eqref{eq:positive} and \eqref{eq:negative} are the
+Jordan parts, each with $2m$ unit atoms.
+
+\subsection{Exact transport and zero-padding}
+
+The two supports in \eqref{eq:positive} and \eqref{eq:negative} are disjoint
+subsets of $\Z^3$.  Every distance from a source atom to a target atom is at
+least one, so every coupling costs at least $2m$.  For the reverse bound, match
+$(1,a)$ to $(2,a)$ for every atom $a$ of $\nu_m^+$, and match
+$(2,b)$ to $(1,b)$ for every atom $b$ of $\nu_m^-$.  Each of the $2m$ units
+moves by one, giving
+\[
+  \lVert\Delta_m\rVert_{\KR,1}=2m.
+\]
+Equation~\eqref{eq:input-one} now proves \cref{thm:main} for three
+parameters.  For $n>3$, append zero coordinates to every grade and atom.
+Monotonicity, sublevel components, and both $\ell^1$ costs are unchanged.
+
+\section{Consequences and robustness}\label{sec:consequences}
+
+\subsection{No graph-independent modulus on the unit cube}
+
+For $m\geq2$, divide every grade by $m$.  Denote the resulting filtrations
+by $\widetilde f_m,\widetilde g_m$.  All grades lie in $[0,1]^n$ and scalar
+dilation pushes forward the Hilbert signed measures.  Since the ground
+metric is homogeneous,
+\begin{equation}\label{eq:unit-cube}
+  \lVert\widetilde f_m-\widetilde g_m\rVert_1=\frac1m,
+  \qquad
+  \bigl\lVert
+    \mu_{H_0(\widetilde f_m)}
+    -\mu_{H_0(\widetilde g_m)}
+  \bigr\rVert_{\KR,1}=2.
+\end{equation}
+
+\begin{corollary}\label{cor:no-modulus}
+For every fixed $n\geq3$, the Hilbert signed-measure map on all finite
+$n$-parameter filtered graphs has no graph-independent modulus of uniform
+continuity, even with grades restricted to $[0,1]^n$.  In particular, no
+bound
+\[
+  \lVert\mu_{H_0(f)}-\mu_{H_0(g)}\rVert_{\KR,1}
+  \leq C\lVert f-g\rVert_1^\alpha
+\]
+holds uniformly for any $C<\infty$ and $\alpha>0$.
+\end{corollary}
+
+\begin{proof}
+In \eqref{eq:unit-cube}, the input tends to zero while the output remains
+two.  The Hölder conclusion follows by taking $m$ large enough that
+$C/m^\alpha<2$.
+\end{proof}
+
+Although the graph grows with $m$, it remains simple, planar,
+two-terminal series-parallel, and of treewidth two.  Its size is
+\[
+  |V(S_m)|=m+2,\qquad |E(S_m)|=2m+1,\qquad |S_m|=3m+3
+\]
+when vertices and edges are both counted as simplices.  Along this family,
+any valid complex-dependent replacement constant must grow at least
+linearly: the ratio is
+$2(|V|-2)=\tfrac23(|S_m|-3)$.
+
+\subsection{Lower-star filtrations}
+
+The freedom to grade edges independently is not essential.
+
+\begin{proposition}[Lower-star realization]\label{prop:lower-star}
+For every $n\geq3$ and $m\geq1$, there are vertex functions on a subdivided
+finite graph, denoted $v_m^f$ and $v_m^g$, whose induced lower-star
+filtrations $f_m^{\mathrm{LS}}$ and $g_m^{\mathrm{LS}}$ satisfy
+\[
+  \lVert v_m^f-v_m^g\rVert_1=1,\qquad
+  \lVert f_m^{\mathrm{LS}}-g_m^{\mathrm{LS}}\rVert_1=3,
+  \qquad
+  \bigl\lVert
+    \mu_{H_0(f_m^{\mathrm{LS}})}
+    -\mu_{H_0(g_m^{\mathrm{LS}})}
+  \bigr\rVert_{\KR,1}=2m.
+\]
+After division by $m$, the vertex-input distance is $1/m$, the induced
+simplexwise distance is $3/m$, and the output distance is $2$.
+\end{proposition}
+
+\begin{proof}
+Subdivide every edge of $S_m$ once.  Give each original vertex grade zero
+and give the midpoint of an old edge its old edge grade.  In the induced
+lower-star filtration, the midpoint and both incident subdivided edges enter
+at exactly the old edge grade.  Replacing an active old edge by this active
+two-edge path preserves connected components at every parameter, so the
+$H_0$ Hilbert functions and signed measures are unchanged.
+
+Only the midpoint of the central edge has different vertex grades.  Its own
+grade and the grades of its two incident subdivided edges each move by one,
+giving total filtration displacement three.  Rescaling gives the last
+claim.
+\end{proof}
+
+\subsection[Same-family H1 and Euler cancellation]
+{Same-family \(H_1\) and Euler cancellation}
+
+The dimension-independent Euler bound \eqref{eq:euler-positive} may seem
+surprising next to \cref{thm:main}.  The same graph family explains the
+difference.
+Set
+\[
+  \sigma_m=\sum_{j=1}^m\delta_{p_j}
+          -\sum_{j=1}^{m-1}\delta_{c_j},
+  \qquad
+  \nu_m=\delta_{(0,0)}-\sigma_m.
+\]
+Let $\Delta_i=\mu_{H_i(f_m)}-\mu_{H_i(g_m)}$ and
+$\Delta_\chi=\Delta_0-\Delta_1$.
+
+\begin{proposition}[Atomwise Euler cancellation]\label{prop:euler-cancel}
+For the family in \cref{thm:main},
+\[
+  \Delta_0=\eta\otimes(\delta_{(0,0)}-\sigma_m),\qquad
+  \Delta_1=-\eta\otimes\sigma_m,\qquad
+  \Delta_\chi=\eta\otimes\delta_{(0,0)}.
+\]
+Moreover,
+\[
+  \lVert\Delta_0\rVert_{\KR,1}=2m,\qquad
+  \lVert\Delta_1\rVert_{\KR,1}=2m-1,\qquad
+  \lVert\Delta_\chi\rVert_{\KR,1}=1.
+\]
+\end{proposition}
+
+\begin{proof}
+For a sublevel graph,
+\[
+  \beta_1=|E|-|V|+\beta_0.
+\]
+Inside the slab, $g_m$ has exactly one more active edge than $f_m$ whenever
+the common vertex grade is active.  Hence the $H_1$ Hilbert-function
+difference is the $H_0$ difference with the upper-orthant indicator born at
+$(1,0,0)$ and dying at $(2,0,0)$ removed.  Möbius inversion gives the three
+displayed identities.
+
+The $H_1$ Jordan parts have $m+(m-1)=2m-1$ atoms each: corner atoms on one
+layer and path atoms on the other.  Their supports are disjoint integer
+lattices and the vertical matching has unit cost per atom.  The Euler
+difference has just the two atoms $(1,0,0)$ and $(2,0,0)$.
+\end{proof}
+
+In the alternating Euler sum, all staircase atoms cancel and only the moved
+simplex remains.
+
+\section{The module-level presentation distance}\label{sec:p3}
+
+For a filtered graph, the cellular sequence
+\[
+  C_1(f_m)\xrightarrow{\partial_1}C_0(f_m)
+  \longrightarrow H_0(f_m)\longrightarrow0
+\]
+is a finite labeled presentation.  Choose the same orientations and simplex
+ordering for $f_m$ and $g_m$.  The resulting matrices are identical.  Their
+row labels and arm-column labels agree, while the central column label moves
+from $(2,0,0)$ to $(1,0,0)$.
+
+Bjerkevik and Lesnick define the preliminary $1$-presentation distance
+between modules by minimizing the total $\ell^1$ label displacement over
+compatible same-matrix presentations.  Their presentation distance
+$d_{\mathcal I}^{1}$ is the path metric induced by this preliminary
+dissimilarity~\cite[Section~3.1 and Definition~3.2]{BjerkevikLesnick2021};
+see also the complexity analysis of Bjerkevik and
+Botnan~\cite{BjerkevikBotnan2025}.
+This compatible pair has cost one, so the one-step path gives
+\[
+  \dI(H_0(f_m),H_0(g_m))\leq1.
+\]
+The pointwise cokernel of the incidence presentation is ordinary cellular
+$H_0$.  Its Hilbert function is therefore the component-count function from
+\cref{sec:family}, whose signed-Wasserstein value is $2m$.  This proves
+\cref{thm:p3}.
+
+After scaling every presentation label by $1/m$, we have
+\[
+  \dI(M_m,N_m)\leq\frac1m,\qquad
+  d^{\Hil}_{W,1}(M_m,N_m)=2.
+\]
+The module invariant therefore has no dimension-only modulus of uniform
+continuity.  The argument uses only the upper bound on $\dI$; equality is
+neither needed nor claimed.
+
+\section{Artifact and reproducibility}\label{sec:artifact}
+
+The paper is accompanied by a kernel-checked Lean formalization and an
+independent finite computation.  The accompanying repository contains the
+Lean source, build instructions, and pinned dependencies: Lean
+\texttt{v4.33.0-rc1} and Mathlib at the revision recorded in the Lake manifest.
+Running \texttt{lake build} from the repository root checks the complete formal
+development; the README gives prerequisites and additional audit commands.  A
+NetworkX/NumPy/SciPy script independently reproduces the $H_0$ component
+counts, finite differences, and optimal assignments for $m=1,\ldots,15$.  The
+computation is not used as a premise in Lean.
+
+\paragraph{Use of AI-assisted tools.}
+AI-assisted tools were used for literature triage, Lean formalization,
+and manuscript editing.  The proofs were developed over the course of two
+months from conversations between the author and GPT-5.5 / 5.6 Sol.  The
+author checked all mathematical statements and proof artifacts and takes
+responsibility for the content.
+
+\paragraph{Competing interests.}
+The author declares no competing interests.
+
+\paragraph{Data and code availability.}
+All constructions are finite and specified in the paper.  Lean source,
+build metadata, and secondary verification scripts are available from
+\url{https://github.com/ZeterMordio/one-edge-instability} under the
+Apache-2.0 license.  \hyperref[app:lean]{Appendix~\ref*{app:lean}} gives the
+theorem-to-source map and the formal trust audit.
+% RELEASE GATE: Replace this pre-release sentence with the exact GitHub commit
+% and Zenodo software DOI after the public release has been archived.
+The archived software
+release will identify its exact commit and DOI.  This preprint and its source
+are licensed under
+\href{https://creativecommons.org/licenses/by/4.0/}{CC BY~4.0}.
+
+\appendix
+\section{Lean formalization certificate}\label{app:lean}
+
+The formal development uses Lean~\cite{deMouraUllrich2021} and
+Mathlib~\cite{Mathlib2020}.  The principal $H_0$ source file,
+\texttt{P1.lean}, imports only \texttt{Mathlib}.  It belongs to the
+\texttt{OneEdgeInstability} library; the module-level result is proved
+separately in \texttt{P3.lean}.  The development introduces the following
+definitions for this family:
+
+\begin{itemize}[leftmargin=1.4em]
+  \item finite vertex, edge, and simplex types for $S_m$;
+  \item real sublevel graphs and ordinary cellular $H_0=C_0/\operatorname{im}\partial_1$;
+  \item finite signed atomic measures, lower-orthant cumulative functions,
+        and uniqueness of Möbius inversion;
+  \item conversion to Mathlib signed measures and identification of their
+        Jordan positive and negative parts;
+  \item $\KR_1$ as an infimum over Mathlib measures on
+        $\R^n\times\R^n$, with measurable-set marginal equations and
+        \texttt{lintegral} cost;
+  \item labeled cellular presentations and the finite-path definition
+        of $d_{\mathcal I}^1$;
+  \item cellular $H_1=\ker\partial_1$, field-independent rank, and the
+        Euler-Poincaré bridge.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.39\textwidth}
+                >{\raggedright\arraybackslash}p{0.51\textwidth}}
+\toprule
+Paper statement & Lean declaration\\
+\midrule
+\Cref{thm:main} &
+\texttt{P1.theorem1\_H0\_counterexample\_family}\\
+Failure of the constant-$n$ bound &
+\texttt{P1.proposed\_constant\_n\_P1\_inequality\_false}\\
+No finite dimension-only constant &
+\texttt{P1.no\_finite\_dimension\_only\_P2\_constant}\\
+Diamond example $4>3$ &
+\texttt{P1.n3\_m2\_explicit\_counterexample}\\
+Unit-cube rescaling \eqref{eq:unit-cube} &
+\texttt{P1.unit\_cube\_H0\_counterexample\_family}\\
+Arbitrarily small inputs &
+\texttt{P1.arbitrarily\_close\_unit\_cube\_counterexamples}\\
+\Cref{prop:euler-cancel} &
+\texttt{P1.same\_family\_H1\_and\_Euler\_cancellation}\\
+\Cref{thm:p3} &
+\texttt{P3.p3\_H0\_presentation\_counterexample\_family}\\
+\bottomrule
+\end{tabular}
+\caption{Public theorem-to-paper map.}
+\label{tab:lean-map}
+\end{table}
+
+All Lean names in \cref{tab:lean-map} share the root namespace
+\texttt{OneEdgeInstability}, which is omitted there.
+
+The chain-level $H_0$ proof identifies the quotient by the span of oriented
+edge boundaries with the free vector space on connected components.  For
+$H_1$, the proof identifies the range of the boundary with that same
+cellular span, applies rank-nullity, and constructs the two Hilbert measures
+before subtracting them.  The transport lower bound follows directly from
+the marginal equations: every product-measure coupling is supported on the
+finite source-to-target product, where the disjoint integer lattices impose
+cost at least one per unit of mass.  The upper bound is the vertical
+matching, written as a finite sum of Dirac measures on the product.
+
+The checked source contains no \texttt{sorry}, \texttt{admit}, user-defined
+\texttt{axiom}, or \texttt{unsafe} declaration.  For the audited public
+theorems, \texttt{\#print axioms} reports only Lean's standard principles
+\texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+
+The positive $n\leq2$ half of \cref{cor:phase} is cited rather than
+reformalized.  The minimality proof in \cref{prop:minimal} and the
+subdivision argument in \cref{prop:lower-star} are paper proofs, not Lean
+theorems.  Lean checks the counterexample family, the signed-measure and
+transport identifications, the rescaling, the module presentation theorem,
+and \cref{prop:euler-cancel}.
+
+\begin{thebibliography}{99}
+\raggedright
+\interlinepenalty=10000
+
+\bibitem{LoiseauxEtAl2023}
+D.~Loiseaux, L.~Scoccola, M.~Carrière, M.~B.~Botnan, and S.~Oudot.
+\newblock Stable vectorization of multiparameter persistent homology using
+signed barcodes as measures.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+volume~36, pages 68316--68342, 2023.
+\newblock \doi{10.52202/075280-2987}.
+\newblock \url{https://proceedings.neurips.cc/paper_files/paper/2023/hash/d75c474bc01735929a1fab5d0de3b189-Abstract-Conference.html}.
+
+\bibitem{OudotScoccola2024}
+S.~Oudot and L.~Scoccola.
+\newblock On the stability of multigraded Betti numbers and Hilbert
+functions.
+\newblock \emph{SIAM Journal on Applied Algebra and Geometry},
+8(1):54--88, 2024.
+\newblock \doi{10.1137/22M1489150}.
+
+\bibitem{BjerkevikLesnick2021}
+H.~B.~Bjerkevik and M.~Lesnick.
+\newblock $\ell^p$-distances on multiparameter persistence modules.
+\newblock arXiv:2106.13589v2, 2021.
+\newblock \url{https://arxiv.org/abs/2106.13589}.
+
+\bibitem{BotnanLesnick2023}
+M.~B.~Botnan and M.~Lesnick.
+\newblock An introduction to multiparameter persistence.
+\newblock In \emph{Representations of Algebras and Related Structures},
+EMS Series of Congress Reports, pages 77--150. European Mathematical
+Society, 2023.
+\newblock \doi{10.4171/ECR/19/4}.
+
+\bibitem{ScoccolaEtAl2024}
+L.~Scoccola, S.~Setlur, D.~Loiseaux, M.~Carrière, and S.~Oudot.
+\newblock Differentiability and optimization of multiparameter persistent
+homology.
+\newblock In \emph{Proceedings of the 41st International Conference on
+Machine Learning}, volume 235 of \emph{Proceedings of Machine Learning
+Research}, pages 43986--44011, 2024.
+\newblock \url{https://proceedings.mlr.press/v235/scoccola24a.html}.
+
+\bibitem{BotnanOppermannOudot2025}
+M.~B.~Botnan, S.~Oppermann, and S.~Oudot.
+\newblock Signed barcodes for multi-parameter persistence via rank
+decompositions and rank-exact resolutions.
+\newblock \emph{Foundations of Computational Mathematics},
+25:1815--1874, 2025.
+\newblock \doi{10.1007/s10208-024-09672-9}.
+
+\bibitem{BjerkevikBotnan2025}
+H.~B.~Bjerkevik and M.~B.~Botnan.
+\newblock Computing $p$-presentation distances is hard.
+\newblock \emph{Discrete \& Computational Geometry}, 75(4):1414--1454,
+2026; published online 2025.
+\newblock \doi{10.1007/s00454-025-00744-3}.
+
+\bibitem{LoiseauxSchreiber2024}
+D.~Loiseaux and H.~Schreiber.
+\newblock \texttt{multipers}: Multiparameter persistence for machine
+learning.
+\newblock \emph{Journal of Open Source Software}, 9(103):6773, 2024.
+\newblock \doi{10.21105/joss.06773}.
+
+\bibitem{deMouraUllrich2021}
+L.~de Moura and S.~Ullrich.
+\newblock The Lean~4 theorem prover and programming language.
+\newblock In \emph{Automated Deduction---CADE 28}, pages 625--635.
+Springer, 2021.
+\newblock \doi{10.1007/978-3-030-79876-5_37}.
+
+\bibitem{Mathlib2020}
+The Mathlib Community.
+\newblock The Lean mathematical library.
+\newblock In \emph{Proceedings of the 9th ACM SIGPLAN International
+Conference on Certified Programs and Proofs}, pages 367--381, 2020.
+\newblock \doi{10.1145/3372885.3373824}.
+
+\end{thebibliography}
+
+\end{document}

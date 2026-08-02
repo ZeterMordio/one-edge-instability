@@ -1,0 +1,16 @@
+{
+  "files.exclude": {
+    "**/.lake": true
+  },
+  "search.exclude": {
+    "**/.lake": true
+  },
+  "lean4.input.enabled": true,
+  "lean4.input.leader": "\\",
+  "lean4.infoview.autoOpen": true,
+  "lean4.infoview.autoOpenShowsGoal": true,
+  "lean4.infoview.expectedTypeVisibility": "Expanded by default",
+  "lean4.infoview.showGoalNames": true,
+  "lean4.showDiagnosticGutterDecorations": true,
+  "lean4.showUnsolvedGoalsDecoration": true
+}

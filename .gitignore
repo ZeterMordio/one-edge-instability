@@ -1,0 +1,46 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.DS_Store
+/tmp/
+
+# Local-only research and agent material
+/AGENTS.md
+/COUNTEREXAMPLE_NOTE.pdf
+/hilbert_stability/
+/notes/
+
+# Virtual environments
+.venv
+
+# Local environment and credential files
+.env
+.env.*
+!.env.example
+
+# Lean/Lake build artifacts
+/.lake
+
+# LaTeX auxiliary files
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+# Local-only publication companion
+/paper/companion/
+
+# Project-owned Lean editor setup (overrides the global .vscode ignore)
+!/.vscode/
+!/.vscode/extensions.json
+!/.vscode/settings.json
+!/.vscode/tasks.json

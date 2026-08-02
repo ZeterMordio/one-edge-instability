@@ -1,0 +1,11 @@
+[project]
+name = "one-edge-instability"
+version = "1.0.0"
+description = "Independent computational checks for Hilbert signed-measure counterexamples"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "networkx>=3.6.1",
+    "numpy>=2.5.1",
+    "scipy>=1.18.0",
+]

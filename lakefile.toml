@@ -1,0 +1,18 @@
+name = "one_edge_instability"
+version = "1.0.0"
+keywords = ["math", "multiparameter persistence", "counterexample"]
+defaultTargets = ["OneEdgeInstability"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.33.0-rc1"
+
+[[lean_lib]]
+name = "OneEdgeInstability"
